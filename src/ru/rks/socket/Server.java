@@ -11,19 +11,20 @@ public class Server {
         try (Socket clientSocket = serverSocket.accept();
              InputStream inputStream = clientSocket.getInputStream();
              OutputStream outputStream = clientSocket.getOutputStream();
-             BufferedReader bufferedReader= new BufferedReader(new InputStreamReader(inputStream));
-             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+             DataInputStream dataInputStream = new DataInputStream(inputStream);
+             DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
 
 
             System.out.println("Новое соединение: "+clientSocket.getInetAddress().toString());
             String string;
-            while((string=bufferedReader.readLine())!=null){
+            while(true){
+                string = dataInputStream.readUTF();
+                System.out.println("Прислал клиент: "+string);
+                dataOutputStream.writeUTF(string);
+                System.out.println("отправлено клиенту"+string);
                 if(string.equalsIgnoreCase("exit")){
                     break;
                 }
-                System.out.println("Прислал клиент: "+string);
-                bufferedWriter.write(string);
-                System.out.println("отправлено клиенту"+string);
                 outputStream.flush();
             }
             System.out.println("Клиент отключился");

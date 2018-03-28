@@ -8,19 +8,22 @@ public class Client {
         try (Socket socket = new Socket("localhost", 8080);
              InputStream inputStream = socket.getInputStream();
              OutputStream outputStream = socket.getOutputStream();
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
              BufferedReader scan = new BufferedReader(new InputStreamReader(System.in));
-             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream))) {
+             DataInputStream dataInputStream = new DataInputStream(inputStream);
+             DataOutputStream dataOutputStream = new DataOutputStream(outputStream)) {
              String fromUser,fromServer;
-             while((fromUser=scan.readLine())!=null){
-                 bufferedWriter.write(fromUser);
+             while(true){
+                 System.out.println("Введите строку");
+                 fromUser = scan.readLine();
+                 dataOutputStream.writeUTF(fromUser);
                  System.out.println("Отправлено серверу "+ fromUser );
-                 fromServer= bufferedReader.readLine();
-                 System.out.println("Сервер прислал"+ fromServer);
-                 if(fromUser.equalsIgnoreCase("exit")){
+                 fromServer = dataInputStream.readUTF();
+                 System.out.println("Сервер прислал "+ fromServer);
+                 if(fromServer.equalsIgnoreCase("exit")){
                      break;
                  }
              }
+            System.out.println("Вы отключились");
         } catch (IOException e) {
             e.printStackTrace();
         }
